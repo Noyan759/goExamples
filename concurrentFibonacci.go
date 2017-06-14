@@ -1,26 +1,24 @@
 package main
 
-import (
-	"fmt"
-)
+import "fmt"
 
-func goconcfib(n int) chan int {
-	result := make(chan int)
-	go concfib(n, result)
-	return result
+func fib(n int) chan int {
+	c := make(chan int)
+	go goFib(n, c)
+	return c
 }
 
-func concfib(n int, output chan int) {
-	if n < 2 {
-	output <- 1
+func goFib(n int, c chan int) {
+	if n<2 {
+		c <- 1
 	} else {
-	a, b := goconcfib(n-1), goconcfib(n-2)
-	output <- (<-a) + (<-b)
+		x := <-fib(n-1)
+		y := <-fib(n-2)
+		c <- x+y
 	}
-	close(output)
+	close(c)
 }
 
 func main() {
-	number:= 50
-	fmt.Printf("fib(%d) = %d\n", number, <-goconcfib(number))
+	fmt.Println("fibonacci: ", <-fib(5))
 }
